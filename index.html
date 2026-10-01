@@ -22,11 +22,24 @@ button,input,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!im
 .aux{min-height:55vh;outline:none;font:18px/1.7 Georgia,serif}.card{border:1px solid #d7cfbf;border-radius:10px;padding:16px;margin:12px 0;background:#fbf8ef}.card blockquote{margin:0;white-space:pre-wrap;font:17px/1.6 Georgia,serif}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row input{max-width:120px}.goal{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{border:1px solid #d7cfbf;border-radius:10px;padding:18px}.metric b{display:block;font:30px Georgia,serif}.metric small{color:#887f72}
 .toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#282724;border:1px solid var(--line);padding:10px 14px;border-radius:999px;z-index:100}
 @media(max-width:700px){.shelf{padding-top:22px}.paper{box-shadow:none;border-radius:0;min-height:100%;padding:44px 26px 110px}.workspace{padding:0 0 85px}.status{display:none}.goal{grid-template-columns:1fr}.barTitle{max-width:30vw}.count{display:none}}
+
+/* Build 03 · Idea Forge */
+.pinnedIdea{margin:0 0 32px;border:1px solid #d8c7a5;background:#fbf4e5;border-radius:10px;padding:13px 14px;display:flex;gap:12px;align-items:flex-start}
+.pinnedIdea>div:first-child{flex:1;min-width:0}.pinnedIdea small,.forgeBrief small,.forgeCard small,.savedSpark small{display:block;color:#8a7346;font:700 10px system-ui;letter-spacing:.14em;text-transform:uppercase}
+.pinnedIdea p{margin:5px 0 0;color:#4b4336;font:14px/1.5 system-ui}.pinnedIdeaActions{display:flex;gap:5px}.pinnedIdeaActions button{min-height:30px;padding:0 8px;background:#f1e5cf;border-color:#dccbac;color:#51483a;font-size:11px}
+.forgeHead{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}.forgeHead h2{margin:0;font:500 34px/1.1 Georgia,serif}.forgeHead p{color:#8d877a;max-width:520px;margin:8px 0 0;line-height:1.5}
+.forgeControls{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 0 14px}.forgeControls label{display:grid;gap:5px;color:#7e7568;font:700 9px system-ui;letter-spacing:.12em;text-transform:uppercase}.forgeControls select{min-height:40px;width:100%;border:1px solid #d8cebd;border-radius:8px;background:#fffdf8;color:#302b23;padding:0 9px}
+.forgeBrief{border-left:3px solid #a9874e;background:#fbf7ee;padding:15px 17px;margin-bottom:12px}.forgeBrief p{margin:7px 0 0;font:18px/1.5 Georgia,serif}
+.forgeGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.forgeCard{min-height:118px;border:1px solid #ddd4c4;border-radius:10px;background:#fffdf8;padding:13px 14px}.forgeCard.locked{border-color:#b79558;background:#fbf0db}.forgeCardHead{display:flex;justify-content:space-between;align-items:center}.forgeCardHead button{min-height:28px;width:30px;padding:0;border-radius:999px;background:transparent;border-color:transparent;color:#786b57}.forgeCard p{margin:10px 0 0;font:16px/1.45 Georgia,serif}
+.forgeActions{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 30px}.forgeActions button,.savedSparkActions button,.forgeHead button{min-height:36px;background:#eee7d8;border-color:#d8cebc;color:#403a31}.forgeActions .primary,.forgeHead .primary{background:#393329;border-color:#393329;color:#f7f1e6}.forgeActions .practice{background:#856735;border-color:#856735;color:#fff8ed}
+.savedSparks{border-top:1px solid #ddd3c2;padding-top:20px}.savedSparksHead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.savedSparksHead b{font:700 10px system-ui;letter-spacing:.14em;text-transform:uppercase;color:#8a7346}.savedSparksHead span{font-size:11px;color:#91897c}.savedSparkList{display:grid;gap:8px}.savedSpark{border:1px solid #ddd4c4;border-radius:9px;background:#fbf8f0;padding:13px}.savedSpark p{margin:5px 0 11px;font:14px/1.45 Georgia,serif}.savedSparkActions{display:flex;gap:6px;flex-wrap:wrap}.savedSparkActions button{min-height:30px;padding:0 9px;font-size:11px}.savedSparkActions .danger{background:transparent;color:#8d564e}
+@media(max-width:700px){.forgeHead{flex-direction:column}.forgeHead>button{width:100%}.forgeControls,.forgeGrid{grid-template-columns:1fr}.pinnedIdea{margin-top:-8px}.forgeActions button{flex:1 1 auto}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <input id="importFile" type="file" accept=".json,application/json" hidden>
+<script src="./idea-forge.js"></script>
 <script>
 (function(){
 "use strict";
@@ -129,6 +142,56 @@ function bindEditor(){
  document.querySelectorAll("[data-jump-p]").forEach(function(x){x.onclick=function(){jumpPlaceholder(b,x.dataset.jumpP)}});
  document.querySelectorAll("[data-resolve-p]").forEach(function(x){x.onclick=function(){resolvePlaceholder(b,x.dataset.resolveP)}});
 }
+
+function forgeClone(x){return JSON.parse(JSON.stringify(x))}
+function forgeDefault(){return WEBNEO_FORGE.createState({})}
+function ensureForge(b){
+ b.ideaForge=WEBNEO_FORGE.createState(b.ideaForge);
+ if(!b.ideaForge.current)b.ideaForge=WEBNEO_FORGE.generate(b.ideaForge,true);
+ return b.ideaForge;
+}
+function forgeOpts(list,current,labelKey){
+ return list.map(function(x){var v=labelKey?x[labelKey]:x;var l=labelKey?x.label:x;return '<option value="'+esc(v)+'" '+(current===v?'selected':'')+'>'+esc(l)+'</option>'}).join('');
+}
+function renderPinnedForge(b){
+ var f=ensureForge(b),i=f.pinned;if(!i)return '';
+ return '<div class="pinnedIdea"><div><small>Practice prompt</small><p>'+esc(i.brief)+'</p></div><div class="pinnedIdeaActions"><button data-open-forge>Forge</button><button data-clear-forge aria-label="Dismiss prompt">×</button></div></div>';
+}
+function savedForgeCard(i){
+ return '<div class="savedSpark"><small>'+esc((WEBNEO_FORGE.modes.find(function(m){return m.id===i.mode})||{label:"Spark"}).label)+'</small><p>'+esc(i.brief)+'</p><div class="savedSparkActions"><button data-pin-spark="'+i.id+'">Pin</button><button data-copy-spark="'+i.id+'">Copy</button><button class="danger" data-delete-spark="'+i.id+'">Delete</button></div></div>';
+}
+function forgeView(b){
+ var f=ensureForge(b),i=f.current,slots=WEBNEO_FORGE.slots(f.mode);
+ return '<div class="forgeHead"><div><small class="aux-eyebrow">IDEA FORGE · OFFLINE</small><h2>'+esc(i.title)+'</h2><p>Lock the pieces you like, reroll the rest, then pin the spark above your manuscript. No AI or internet required.</p></div><button class="primary" id="forgeReroll">Reroll unlocked</button></div>'+
+ '<div class="forgeControls"><label>Exercise<select data-forge-setting="mode">'+forgeOpts(WEBNEO_FORGE.modes,f.mode,"id")+'</select></label><label>Genre<select data-forge-setting="genre">'+forgeOpts(WEBNEO_FORGE.genres,f.genre)+'</select></label><label>Mood<select data-forge-setting="mood">'+forgeOpts(WEBNEO_FORGE.moods,f.mood)+'</select></label></div>'+
+ '<div class="forgeBrief"><small>Writing brief</small><p>'+esc(i.brief)+'</p></div>'+
+ '<div class="forgeGrid">'+slots.map(function(sl){return '<div class="forgeCard '+(f.locks[sl.key]?'locked':'')+'"><div class="forgeCardHead"><small>'+esc(sl.label)+'</small><button data-forge-lock="'+sl.key+'" aria-label="Lock or unlock '+esc(sl.label)+'">'+(f.locks[sl.key]?'🔒':'○')+'</button></div><p>'+esc(i.values[sl.key]||"")+'</p></div>'}).join('')+'</div>'+
+ '<div class="forgeActions"><button id="forgeNew">New spark</button><button id="forgeUnlock">Unlock all</button><button id="forgeCopy">Copy</button><button id="forgeSave">Save spark</button><button class="primary" id="forgePin">Pin to manuscript</button><button class="practice" id="forgePractice">Start 15-min practice</button></div>'+
+ '<div class="savedSparks"><div class="savedSparksHead"><b>Saved sparks</b><span>'+(f.saved.length?f.saved.length+" kept":"Keep the ones that bite.")+'</span></div>'+(f.saved.length?'<div class="savedSparkList">'+f.saved.map(savedForgeCard).join('')+'</div>':'<div class="large-empty">Nothing saved yet.</div>')+'</div>';
+}
+function forgeFind(b,id){return ensureForge(b).saved.find(function(x){return x.id===id})}
+function forgeReroll(b,fresh){var f=ensureForge(b);if(fresh)f.locks={};b.ideaForge=WEBNEO_FORGE.generate(f,!!fresh);save();renderEditor();toast(fresh?"Fresh spark forged.":"Unlocked pieces rerolled.")}
+function forgeCopy(i){if(!i)return;var t=WEBNEO_FORGE.asText(i);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast("Prompt copied.")}).catch(function(){forgeCopyFallback(t)});else forgeCopyFallback(t)}
+function forgeCopyFallback(t){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("Prompt copied.")}finally{a.remove()}}
+function forgePin(b,i){if(!i)return;ensureForge(b);b.ideaForge.pinned=forgeClone(i);state.mode="manuscript";save();renderEditor();setTimeout(focusEditor,0);toast("Prompt pinned above the draft.")}
+function bindForgeEvents(b){
+ document.querySelectorAll("[data-forge-setting]").forEach(function(el){el.onchange=function(){var f=ensureForge(b),k=el.dataset.forgeSetting;f[k]=el.value;if(k==="mode")f.locks={};b.ideaForge=WEBNEO_FORGE.generate(f,k==="mode");save();renderEditor()}});
+ document.querySelectorAll("[data-forge-lock]").forEach(function(el){el.onclick=function(){var f=ensureForge(b),k=el.dataset.forgeLock;f.locks[k]=!f.locks[k];b.ideaForge=f;save();renderEditor()}});
+ var rr=document.getElementById("forgeReroll");if(rr)rr.onclick=function(){forgeReroll(b,false)};
+ var nn=document.getElementById("forgeNew");if(nn)nn.onclick=function(){forgeReroll(b,true)};
+ var uu=document.getElementById("forgeUnlock");if(uu)uu.onclick=function(){var f=ensureForge(b);f.locks={};b.ideaForge=f;save();renderEditor()};
+ var cc=document.getElementById("forgeCopy");if(cc)cc.onclick=function(){forgeCopy(ensureForge(b).current)};
+ var ss=document.getElementById("forgeSave");if(ss)ss.onclick=function(){var f=ensureForge(b),i=f.current;if(!f.saved.some(function(x){return x.id===i.id}))f.saved.unshift(forgeClone(i));f.saved=f.saved.slice(0,50);b.ideaForge=f;save();renderEditor();toast("Spark saved.")};
+ var pp=document.getElementById("forgePin");if(pp)pp.onclick=function(){forgePin(b,ensureForge(b).current)};
+ var pr=document.getElementById("forgePractice");if(pr)pr.onclick=function(){var f=ensureForge(b);f.pinned=forgeClone(f.current);b.ideaForge=f;save();startSprint(b,15);toast("15-minute practice started.")};
+ document.querySelectorAll("[data-pin-spark]").forEach(function(el){el.onclick=function(){forgePin(b,forgeFind(b,el.dataset.pinSpark))}});
+ document.querySelectorAll("[data-copy-spark]").forEach(function(el){el.onclick=function(){forgeCopy(forgeFind(b,el.dataset.copySpark))}});
+ document.querySelectorAll("[data-delete-spark]").forEach(function(el){el.onclick=function(){var f=ensureForge(b);f.saved=f.saved.filter(function(x){return x.id!==el.dataset.deleteSpark});b.ideaForge=f;save();renderEditor()}});
+ document.querySelectorAll("[data-open-forge]").forEach(function(el){el.onclick=function(){state.mode="forge";renderEditor()}});
+ document.querySelectorAll("[data-clear-forge]").forEach(function(el){el.onclick=function(){var f=ensureForge(b);f.pinned=null;b.ideaForge=f;save();renderEditor();toast("Prompt unpinned.")}});
+ bindForgeEvents(b);
+}
+
 function focusEditor(){var m=document.getElementById("manuscript");if(m)m.focus()}
 function block(node,root){while(node&&node!==root){if(node.nodeType===1&&/^(P|DIV)$/.test(node.tagName))return node;node=node.parentNode}return null}
 function currentBlock(root){var s=getSelection();return s&&s.rangeCount?block(s.anchorNode,root):null}
