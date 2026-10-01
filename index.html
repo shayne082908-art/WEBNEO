@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#181817">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>WEBNEO · Build 02</title>
+<title>WEBNEO · Build 03</title>
 <style>
 :root{--bg:#181817;--panel:#232321;--paper:#f4efe3;--ink:#302d28;--soft:#989489;--line:#3b3934;--gold:#b99a5d;--danger:#b96e65}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#eee;font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -58,7 +58,7 @@ function fresh(){
 }
 function makeBook(title){
  var id=uid(),ch=uid();
- return {id:id,title:title||"Untitled",author:"",goal:80000,dailyGoal:500,chapterOrder:[ch],chapters:{[ch]:{id:ch,title:"Chapter 1",html:"<p><br></p>"}},notes:"",outline:"",darlings:[],placeholders:[],view:{size:20,dropcap:true,focus:false,typewriter:false},days:{},lastChapter:ch,sprint:null};
+ return {id:id,title:title||"Untitled",author:"",goal:80000,dailyGoal:500,chapterOrder:[ch],chapters:{[ch]:{id:ch,title:"Chapter 1",html:"<p><br></p>"}},notes:"",outline:"",darlings:[],placeholders:[],ideaForge:forgeDefault(),view:{size:20,dropcap:true,focus:false,typewriter:false},days:{},lastChapter:ch,sprint:null};
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(state.lib));document.querySelectorAll("[data-save]").forEach(function(x){x.textContent="Saved"})}
 function load(){try{var x=JSON.parse(localStorage.getItem(KEY)||"null");return x&&x.books?x:fresh()}catch(e){return fresh()}}
@@ -74,7 +74,7 @@ function render(){
 }
 function renderShelf(){
  var books=state.lib.shelves[0].bookIds.map(function(id){return state.lib.books[id]}).filter(Boolean);
- document.getElementById("app").innerHTML='<div class="top"><div class="brand">WEBNEO <small>BUILD 02</small></div><div class="grow"></div><button class="btn" id="backup">Backup</button><button class="btn" id="restore">Restore</button><button class="icon" id="theme">◐</button></div><main class="shelf"><h1>Your bookshelf</h1><p class="intro">A browser-first writing chair inspired by NEO. Draft locally, work offline after first load, and keep the interface quiet until you need it.</p><div class="books">'+books.map(bookCard).join("")+'<button class="book add" id="addBook"><div class="cover">＋</div><div class="bookmeta">New book</div></button></div></main>';
+ document.getElementById("app").innerHTML='<div class="top"><div class="brand">WEBNEO <small>BUILD 03</small></div><div class="grow"></div><button class="btn" id="backup">Backup</button><button class="btn" id="restore">Restore</button><button class="icon" id="theme">◐</button></div><main class="shelf"><h1>Your bookshelf</h1><p class="intro">A browser-first writing chair inspired by NEO. Draft locally, work offline after first load, and keep the interface quiet until you need it.</p><div class="books">'+books.map(bookCard).join("")+'<button class="book add" id="addBook"><div class="cover">＋</div><div class="bookmeta">New book</div></button></div></main>';
  document.getElementById("addBook").onclick=function(){var title=prompt("Book title?","Untitled");if(title===null)return;var b=makeBook(title.trim()||"Untitled");state.lib.books[b.id]=b;state.lib.shelves[0].bookIds.push(b.id);save();openBook(b.id)};
  document.querySelectorAll("[data-book]").forEach(function(x){x.onclick=function(){openBook(x.dataset.book)}});
  document.getElementById("theme").onclick=function(){state.lib.settings.theme=state.lib.settings.theme==="night"?"paper":"night";save();document.body.style.filter=state.lib.settings.theme==="paper"?"invert(.92) hue-rotate(180deg)":""};
@@ -88,16 +88,17 @@ function bookCard(b){
 function openBook(id){state.book=id;var b=currentBook();ensureDay(b);state.chapter=b.lastChapter&&b.chapters[b.lastChapter]?b.lastChapter:b.chapterOrder[0];state.view="editor";state.mode="manuscript";state.drawer=null;render();setTimeout(focusEditor,0)}
 
 function renderEditor(){
- var b=currentBook(),ch=currentChapter(),words=bookWords(b),cw=wc(ch.html),dw=todayWords(b);
+ var b=currentBook();ensureForge(b);var ch=currentChapter(),words=bookWords(b),cw=wc(ch.html),dw=todayWords(b);
  var aux=state.mode!=="manuscript";
- document.getElementById("app").innerHTML='<main class="editor"><header class="top"><button class="icon" id="home">←</button><button class="icon" id="chapters">☰</button><div class="barTitle">'+esc(b.title)+'</div><div class="grow"></div><span class="status" data-save>Saved</span><button class="icon" id="darling" title="Keep selected text">♡</button><button class="icon" id="placeholder" title="Placeholder">◆</button><button class="icon" id="format">Aa</button></header><section class="workspace"><div class="paper">'+(aux?auxView(b):manuscriptView(b,ch))+'</div></section><footer class="bottom"><button class="tab '+(state.mode==="manuscript"?"on":"")+'" data-mode="manuscript">Manuscript</button><button class="tab '+(state.mode==="notes"?"on":"")+'" data-mode="notes">Notes</button><button class="tab '+(state.mode==="outline"?"on":"")+'" data-mode="outline">Outline</button><button class="tab '+(state.mode==="darlings"?"on":"")+'" data-mode="darlings">Darlings</button><button class="tab '+(state.mode==="goals"?"on":"")+'" data-mode="goals">Goals</button><span class="count">'+cw+' chapter · '+words+' book · '+dw+'/'+b.dailyGoal+' today</span></footer></main>'+drawerView(b);
+ document.getElementById("app").innerHTML='<main class="editor"><header class="top"><button class="icon" id="home">←</button><button class="icon" id="chapters">☰</button><div class="barTitle">'+esc(b.title)+'</div><div class="grow"></div><span class="status" data-save>Saved</span><button class="icon" id="darling" title="Keep selected text">♡</button><button class="icon" id="placeholder" title="Placeholder">◆</button><button class="icon" id="format">Aa</button></header><section class="workspace"><div class="paper">'+(aux?auxView(b):manuscriptView(b,ch))+'</div></section><footer class="bottom"><button class="tab '+(state.mode==="manuscript"?"on":"")+'" data-mode="manuscript">Manuscript</button><button class="tab '+(state.mode==="forge"?"on":"")+'" data-mode="forge">Idea Forge</button><button class="tab '+(state.mode==="notes"?"on":"")+'" data-mode="notes">Notes</button><button class="tab '+(state.mode==="outline"?"on":"")+'" data-mode="outline">Outline</button><button class="tab '+(state.mode==="darlings"?"on":"")+'" data-mode="darlings">Darlings</button><button class="tab '+(state.mode==="goals"?"on":"")+'" data-mode="goals">Goals</button><span class="count">'+cw+' chapter · '+words+' book · '+dw+'/'+b.dailyGoal+' today</span></footer></main>'+drawerView(b);
  bindEditor();
  if(b.sprint&&b.sprint.active)startSprintTicker();
 }
 function manuscriptView(b,ch){
- return '<div class="chapterTitle" contenteditable="true" id="chapterTitle">'+esc(ch.title)+'</div><div id="manuscript" class="manuscript '+(b.view.dropcap?"dropcap ":"")+(b.view.focus?"focus ":"")+'" style="--size:'+b.view.size+'px" contenteditable="true" spellcheck="false">'+ch.html+'</div>';
+ return renderPinnedForge(b)+'<div class="chapterTitle" contenteditable="true" id="chapterTitle">'+esc(ch.title)+'</div><div id="manuscript" class="manuscript '+(b.view.dropcap?"dropcap ":"")+(b.view.focus?"focus ":"")+'" style="--size:'+b.view.size+'px" contenteditable="true" spellcheck="false">'+ch.html+'</div>';
 }
 function auxView(b){
+ if(state.mode==="forge")return forgeView(b);
  if(state.mode==="notes"||state.mode==="outline")return '<h2>'+state.mode[0].toUpperCase()+state.mode.slice(1)+'</h2><p style="color:#8d8578">Private working space for this book.</p><div id="aux" class="aux" contenteditable="true">'+(state.mode==="notes"?b.notes:b.outline)+'</div>';
  if(state.mode==="darlings")return '<h2>Darlings</h2><p style="color:#8d8578">Beautiful bits you removed without losing them.</p>'+(b.darlings.length?b.darlings.map(function(d){return '<div class="card"><blockquote>'+esc(strip(d.html))+'</blockquote><div class="row" style="margin-top:12px"><button class="btn" data-restore-d="'+d.id+'">Restore</button><button class="btn" data-delete-d="'+d.id+'">Delete</button></div></div>'}).join(""):'<p>No bodies in the basement yet.</p>');
  var sprint=b.sprint&&b.sprint.active;
