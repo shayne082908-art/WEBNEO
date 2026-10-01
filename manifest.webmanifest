@@ -5,5 +5,5 @@
   "display": "standalone",
   "background_color": "#181817",
   "theme_color": "#181817",
-  "description": "Tablet-first browser writing workspace inspired by NEO."
+  "description": "A tablet-first writing workspace with an offline Idea Forge, inspired by NEO."
 }
