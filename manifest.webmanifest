@@ -1,0 +1,9 @@
+{
+  "name": "WEBNEO",
+  "short_name": "WEBNEO",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#181817",
+  "theme_color": "#181817",
+  "description": "Tablet-first browser writing workspace inspired by NEO."
+}
