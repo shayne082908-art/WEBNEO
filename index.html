@@ -142,7 +142,53 @@ function bindEditor(){
  document.querySelectorAll("[data-delete-d]").forEach(function(x){x.onclick=function(){deleteDarling(b,x.dataset.deleteD)}});
  document.querySelectorAll("[data-jump-p]").forEach(function(x){x.onclick=function(){jumpPlaceholder(b,x.dataset.jumpP)}});
  document.querySelectorAll("[data-resolve-p]").forEach(function(x){x.onclick=function(){resolvePlaceholder(b,x.dataset.resolveP)}});
+ bindForgeEvents(b);
 }
+
+
+var WEBNEO_FORGE=(function(){
+ var MODES=[{id:"premise",label:"Premise"},{id:"scene",label:"Scene"},{id:"character",label:"Character"},{id:"challenge",label:"Challenge"}];
+ var GENRES=["Any","Literary","Fantasy","Science fiction","Mystery","Romance","Horror","Thriller","Historical","Speculative"];
+ var MOODS=["Any","Tender","Uneasy","Playful","Melancholy","Hopeful","Intimate","Strange","Tense","Bittersweet"];
+ var BANK={
+  protagonist:["a night-shift archivist who remembers other people’s dreams","a disgraced cartographer who can no longer recognize roads","a child translator for a family that lies professionally","a locksmith who has never opened the same door twice","a wedding photographer who only notices what people are hiding","an exhausted ghostwriter whose client may not exist","a ferry operator who knows every passenger except one","a botanist keeping a forbidden plant alive in an apartment","a substitute teacher who receives letters from next week","a small-town mechanic rebuilding a car that belonged to a stranger","a retired stage magician who has forgotten one trick","a baker whose recipes predict arguments before they happen"],
+  desire:["wants to leave before anyone notices what they have done","needs one person to believe an impossible story","is trying to recover something they deliberately forgot","must finish a promise made to someone who is gone","wants to be ordinary for exactly one week","is desperate to keep two people from meeting","needs to prove a beautiful thing was not an accident","wants permission to stop being useful","must win back a place they once fled","needs to learn why everyone else remembers the same event differently"],
+  pressure:["but every attempt makes the situation more public","while a deadline keeps moving closer without explanation","and the only helpful witness is lying about something else","while someone begins copying their private decisions","but success would hurt the person they are trying to protect","and a harmless ritual starts producing real consequences","while the town quietly agrees not to discuss what happened","but the evidence points toward the person they trust most","and the easiest solution requires becoming the person they dislike","while an old mistake suddenly becomes valuable to someone dangerous"],
+  turn:["Then the supposed problem asks for help.","Then they discover they have already succeeded once and forgotten it.","Then the person they are protecting confesses first.","Then an object they threw away returns with a note inside.","Then the deadline passes and nothing happens, which is worse.","Then a stranger thanks them for something they have not done yet.","Then the villain offers evidence that makes perfect sense.","Then the safest room becomes the least trustworthy place.","Then the secret becomes useful only if everyone learns it.","Then they realize the choice was designed for them personally."],
+  setting:["during the final week before a coastal town is abandoned","inside a museum being renovated while still open to visitors","on an overnight train with no scheduled stops","in a neighborhood where every house has the same floor plan except one","during a heat wave that keeps knocking out the power","at a family-run hotel preparing for its centennial celebration","in a university library after the semester has ended","on a tiny island receiving its first cell tower","inside a shopping mall being demolished around its remaining stores","in a mountain village reachable only when the weather allows"],
+  image:["a key warm from someone else’s hand","rainwater trapped inside a sealed glass frame","a chair facing the wrong direction in an empty room","a voicemail with breathing but no voice","fresh paint covering only one sentence on a wall","a paper cup with a name nobody recognizes","a row of shoes outside a locked door","an envelope that smells faintly of smoke","a cracked mirror repaired with clear tape","a receipt for something that cannot be bought"],
+  constraint:["Write without using any dialogue tags.","Let the most important fact appear only through what people avoid saying.","Use one ordinary object three times, changing its meaning each time.","Keep the entire scene in one physical room.","Do not describe anyone’s face.","Make the conflict worsen because someone is genuinely kind.","Begin after the obvious dramatic event has already happened.","Let every paragraph contain one concrete sensory detail.","Give the viewpoint character a wrong assumption the reader can detect.","End with an action rather than an explanation."],
+  opening:["Start with an interruption that seems trivial but changes the day.","Open on someone cleaning up evidence of an event the reader has not seen.","Begin with a character rehearsing a sentence they never get to say.","Open with a familiar place containing one impossible detail.","Start at the exact moment a routine stops working.","Begin with someone receiving something they absolutely did not order.","Open with a question whose honest answer would ruin the relationship.","Start with a character pretending not to recognize someone.","Begin with the aftermath of a celebration nobody enjoyed.","Open with a tiny decision that cannot be undone."]
+ };
+ function pick(a){return a[Math.floor(Math.random()*a.length)]}
+ function uid2(){return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))}
+ function slots(mode){
+  if(mode==="scene")return[{key:"setting",label:"Setting"},{key:"pressure",label:"Pressure"},{key:"image",label:"Image"},{key:"constraint",label:"Craft constraint"}];
+  if(mode==="character")return[{key:"protagonist",label:"Character"},{key:"desire",label:"Want"},{key:"image",label:"Motif"},{key:"turn",label:"Turn"}];
+  if(mode==="challenge")return[{key:"opening",label:"Opening move"},{key:"constraint",label:"Constraint"},{key:"image",label:"Image"},{key:"turn",label:"Ending pressure"}];
+  return[{key:"protagonist",label:"Character"},{key:"desire",label:"Want"},{key:"pressure",label:"Pressure"},{key:"turn",label:"Turn"}];
+ }
+ function createState(old){
+  old=old&&typeof old==="object"?old:{};
+  return{mode:MODES.some(function(x){return x.id===old.mode})?old.mode:"premise",genre:GENRES.indexOf(old.genre)>=0?old.genre:"Any",mood:MOODS.indexOf(old.mood)>=0?old.mood:"Any",locks:old.locks&&typeof old.locks==="object"?old.locks:{},current:old.current||null,saved:Array.isArray(old.saved)?old.saved:[],pinned:old.pinned||null};
+ }
+ function makeBrief(st,vals){
+  var flavor=[st.genre!=="Any"?st.genre:"",st.mood!=="Any"?st.mood:""].filter(Boolean).join(" · ");
+  var prefix=flavor?flavor+". ":"";
+  if(st.mode==="scene")return prefix+"Set the scene "+vals.setting+". "+vals.pressure.charAt(0).toUpperCase()+vals.pressure.slice(1)+". Work in "+vals.image+". "+vals.constraint;
+  if(st.mode==="character")return prefix+"Write about "+vals.protagonist+" who "+vals.desire+", "+vals.pressure+". Keep returning to "+vals.image+". "+vals.turn;
+  if(st.mode==="challenge")return prefix+vals.opening+" "+vals.constraint+" Include "+vals.image+". "+vals.turn;
+  return prefix+vals.protagonist.charAt(0).toUpperCase()+vals.protagonist.slice(1)+" "+vals.desire+", "+vals.pressure+". "+vals.turn;
+ }
+ function generate(raw,fresh){
+  var st=createState(raw),old=st.current&&st.current.values?st.current.values:{},vals={};
+  slots(st.mode).forEach(function(sl){vals[sl.key]=(!fresh&&st.locks[sl.key]&&old[sl.key])?old[sl.key]:pick(BANK[sl.key])});
+  st.current={id:uid2(),mode:st.mode,genre:st.genre,mood:st.mood,title:(MODES.find(function(x){return x.id===st.mode})||MODES[0]).label+" spark",values:vals,brief:"",createdAt:new Date().toISOString()};
+  st.current.brief=makeBrief(st,vals); return st;
+ }
+ function asText(i){return i&&i.brief?i.brief:""}
+ return{modes:MODES,genres:GENRES,moods:MOODS,slots:slots,createState:createState,generate:generate,asText:asText};
+})();
 
 function forgeClone(x){return JSON.parse(JSON.stringify(x))}
 function forgeDefault(){return WEBNEO_FORGE.createState({})}
@@ -190,7 +236,6 @@ function bindForgeEvents(b){
  document.querySelectorAll("[data-delete-spark]").forEach(function(el){el.onclick=function(){var f=ensureForge(b);f.saved=f.saved.filter(function(x){return x.id!==el.dataset.deleteSpark});b.ideaForge=f;save();renderEditor()}});
  document.querySelectorAll("[data-open-forge]").forEach(function(el){el.onclick=function(){state.mode="forge";renderEditor()}});
  document.querySelectorAll("[data-clear-forge]").forEach(function(el){el.onclick=function(){var f=ensureForge(b);f.pinned=null;b.ideaForge=f;save();renderEditor();toast("Prompt unpinned.")}});
- bindForgeEvents(b);
 }
 
 function focusEditor(){var m=document.getElementById("manuscript");if(m)m.focus()}
