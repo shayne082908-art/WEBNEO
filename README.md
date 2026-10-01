@@ -1,35 +1,39 @@
-# NEO Web
+# WEBNEO
 
-A tablet-first browser writing workspace inspired by Hugh Howey's open-source NEO editor.
+A tablet-first browser writing app inspired by Hugh Howey's open-source NEO editor.
 
-This repository is an independent browser adaptation/extension project. NEO is MIT-licensed; the original copyright and MIT license are preserved under `licenses/NEO-MIT.txt`.
+## Build 02 — NEO Writing Flow
 
-## Build 02
+This build is directly usable in a browser and intentionally keeps AI out until the core writing experience is proven.
 
-Build 02 proves the daily writing experience rather than adding AI early. It includes:
+Current features:
 
-- bookshelf + books/chapters
-- autosave and offline PWA behavior
-- NEO-style Enter ×2 scene breaks / Enter ×3 chapters
-- poetry paragraphs
-- smart punctuation
-- placeholders
-- exact-anchor Darlings
-- Notes and Outline
-- goals and word sprints
-- focus mode and typewriter scrolling
-- tablet-friendly controls
+- bookshelf and multiple books
+- multiple chapters
+- local autosave
+- JSON backup and restore
+- NEO-style Enter flow: paragraph → scene break → new chapter
+- Shift+Enter poetry paragraphs
+- smart em dashes, ellipses, quotes/apostrophes
+- placeholders / return-later markers
+- Darlings with restoration anchors
+- Notes and Outline workspaces
+- daily and book word goals
+- timed word sprints
+- focus mode
+- typewriter scrolling
+- text size and drop-cap controls
+- offline-capable PWA shell
+- tablet-responsive layout
 
-## Run locally
+## Roadmap
 
-Because it uses ES modules and a service worker, serve the folder over HTTP:
+Build 03: Idea Forge  
+Build 04: Language Lens  
+Build 05: AI Co-writer  
+Build 06: portability/import/export  
+Build 07: tablet hardening and polish
 
-```bash
-python3 -m http.server 8080
-```
+## Attribution
 
-Then open `http://localhost:8080`.
-
-## Static hosting
-
-There is no build step. The repository root is deployable as a static site on Vercel, GitHub Pages, Netlify, Cloudflare Pages, or any ordinary static host.
+NEO by Hugh Howey is MIT-licensed. This is an independent browser adaptation/extension project. See `LICENSE-NEO.txt`.
