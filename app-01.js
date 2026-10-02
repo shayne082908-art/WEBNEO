@@ -271,10 +271,9 @@ function rerollCover(book) {
 
 function bindShelfEvents() {
   app.querySelectorAll('[data-action="new-book"]').forEach(btn => btn.addEventListener('click', async () => {
-    // NEO's + button does not interrupt the writer with setup. Create the book
-    // immediately, open it, and let the title be typed in the writing workspace.
+    const title = prompt('Book title?', 'Untitled'); if (title === null) return;
     const settings = state.library.settings;
-    const book = makeBook({ title: 'Untitled', author: activeAuthor(), defaults: { fontFamily: settings.defaultFont, dropCap: settings.defaultDropCap } });
+    const book = makeBook({ title: title.trim() || 'Untitled', author: activeAuthor(), defaults: { fontFamily: settings.defaultFont, dropCap: settings.defaultDropCap } });
     state.library.books[book.id] = book;
     state.library.shelves.find(s => s.id === btn.dataset.shelf)?.bookIds.push(book.id);
     await persist({ immediate: true }); openBook(book.id);
@@ -333,3 +332,4 @@ function chapterKicker(book, chapterId) {
   }
   return 'Chapter';
 }
+
