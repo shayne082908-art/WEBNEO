@@ -1,24 +1,28 @@
 # Producer Roadmap
 
 ## Build 01 — Browser Foundation ✓
-Bookshelf, browser editing, autosave, backup/restore, offline/PWA shell.
+Browser shell, local persistence, PWA/offline foundation.
 
 ## Build 02 — NEO Writing Flow ✓
-Chapter and scene flow, smart punctuation, Darlings, placeholders, Notes/Outline, goals, sprints, focus/typewriter modes.
+Core drafting loop: chapters, scene breaks, Darlings, placeholders, notes, outline foundation, focus/typewriter, goals and sprints.
 
-## Build 03 — Idea Forge ✓ (current review build)
-Offline idea generation with four exercise modes, genre/mood filters, lockable prompt ingredients, saved sparks, pinned manuscript prompts, and a direct 15-minute practice handoff.
+## Build 03 — Idea Forge ✓
+Offline prompt generator. This remains in the product, but new WEBNEO-only features pause until parity is earned.
 
-**Review gate:** Can the user get from “I have no idea what to write” to actual prose in under ten seconds?
+## Build 04 — NEO Parity Pass 1 ✓
+Shelf/cover/author behavior, chapter notes, structured outlining + ghost prompts, deliberate spellcheck, 30-day momentum chart, quieter interface.
 
-## Build 04 — Language Lens
-Word, phrase, imagery, cadence, register and prose-alternative exploration. Selection-aware suggestions should help rewrite or enrich language without turning into a synonym slot machine.
+## Build 05 — NEO Parity Pass 2
+Import/export parity: DOCX/TXT/Markdown import with structure detection; EPUB/DOCX/PDF/HTML/Markdown/TXT export; snapshot/share flow; browser-safe backup history.
 
-## Build 05 — AI Co-writer
-Optional provider-neutral AI help for brainstorming, continuation, scene scaffolding, dialogue, critique and rewrites. Suggestions must remain previewable and user-controlled; never silently rewrite the manuscript.
+## Build 06 — NEO Parity Pass 3
+Bound shelves / omnibus workflow, parts, copyright/dedication/epigraph/acknowledgments/about-author pages, prologue/epilogue polish, full keyboard shortcuts and localization.
 
-## Build 06 — Portability & Compatibility
-Richer import/export, backup history, NEO interchange where feasible, Markdown/text/docx paths and conflict-safe restoration.
+## Build 07 — Parity Hardening
+Tablet keyboard/composition testing, touch gestures, large-manuscript performance, crash/recovery checks, offline install and fidelity polish against upstream NEO.
 
-## Build 07 — Tablet Hardening & Polish
-Keyboard/composition behavior, accessibility, gestures, performance, recovery UX, install flow and visual refinement.
+## Build 08 — Language Lens
+Only after parity: word, phrase and prose exploration.
+
+## Build 09 — AI Co-writer
+Only after parity: provider-neutral writing assistance with explicit accept/reject edits.

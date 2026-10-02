@@ -1,9 +1,10 @@
 # Third-Party Notices
 
 ## NEO
-WEBNEO is inspired by and adapts ideas from Hugh Howey's open-source NEO editor.
 
-NEO is distributed under the MIT License. The preserved license text is in `LICENSE-NEO.txt`.
+Project: NEO
+Author: Hugh Howey
+Source: https://github.com/hughhowey/neo
+License: MIT
 
-## Build 03
-The Idea Forge prompt corpus and implementation added in WEBNEO Build 03 are original project content and use no third-party prompt dataset or external runtime library.
+This project is an unofficial browser adaptation inspired by NEO's product design and intended to preserve attribution if/when upstream source code is incorporated. The upstream MIT text is stored in `licenses/NEO-MIT.txt`.

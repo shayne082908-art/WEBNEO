@@ -1,9 +1,10 @@
 {
   "name": "WEBNEO",
   "short_name": "WEBNEO",
+  "description": "A tablet-first browser adaptation of NEO with parity-focused writing workflows.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#181817",
-  "theme_color": "#181817",
-  "description": "A tablet-first writing workspace with an offline Idea Forge, inspired by NEO."
+  "background_color": "#141411",
+  "theme_color": "#141411",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }
